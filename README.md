@@ -1,10 +1,14 @@
-# gcm-rs: GNOME Connection Manager in Rust
+# Connection Manager
 
-A rewrite of GNOME Connection Manager in Rust with [egui](https://github.com/emilk/egui), aimed at a
-MobaXterm-style workflow on both **Linux and Windows**. It builds to a single binary with no Python, GTK
-or `expect` needed.
+A tabbed connection manager for **Linux and Windows** in the style of MobaXterm, written in Rust with
+[egui](https://github.com/emilk/egui). It builds to a single binary with no Python, GTK or `expect` needed.
 
-It lives next to the original Python app while it matures.
+It started as a rewrite of [GNOME Connection Manager](https://github.com/kuthulux/gnome-connection-manager)
+(and was called *gcm-rs* up to version 0.1.0); it can still import that app's sessions.
+
+**Coming from gcm-rs 0.1.0:** on first start, `~/.config/gcm-rs` (`%APPDATA%\gcm-rs` on Windows) is moved
+to `connection-manager`, and `gcm.toml` becomes `config.toml`; saved passwords and the master password
+carry over. The package and command are now `connection-manager`, so remove the old `gcm-rs` package.
 
 ## Features
 
@@ -34,7 +38,7 @@ It lives next to the original Python app while it matures.
   works the same as in the SSH tab (see *SFTP* below).
 - **Tunnel manager**: the toolbar's *⇄ Tunnels* button opens a list of saved port forwards (local `-L`,
   remote `-R`, SOCKS `-D`). Each runs through a saved SSH session on its own, without a terminal tab, and can
-  be started, stopped and set to start with gcm. A coloured dot shows its state: grey stopped, yellow
+  be started, stopped and set to start with the app. A coloured dot shows its state: grey stopped, yellow
   connecting, green up, red failed with ssh's error underneath. See *Tunnels* below.
 - **Snippets**: saved commands (MobaXterm's macros), sent from the *📋 Snippets* toolbar menu or a tab's
   *Send snippet* menu. Each line is typed followed by Enter; with MultiExec on they reach the whole group.
@@ -130,7 +134,7 @@ The browser opens a second connection with your system `sftp` (it ships with Ope
 Windows 10/11), using the session's host, port, user, key, keep-alive, compression and any `-o`/`-J`/`-F`
 options from *Extra arguments*. Keys, the agent, `~/.ssh/config` and `known_hosts` apply as usual.
 
-A saved password is handed to ssh through `SSH_ASKPASS`, which points back at `gcm-rs` itself. That helper
+A saved password is handed to ssh through `SSH_ASKPASS`, which points back at `connection-manager` itself. That helper
 answers only password and passphrase prompts. It refuses anything else, including new host keys and
 one-time codes, so if a host is new, connect once in an SSH tab to accept its key, then press *Reconnect*
 in the SFTP pane. The password reaches the helper through the `sftp` process's environment, which other
@@ -146,17 +150,17 @@ Each tunnel runs `ssh -N -o ExitOnForwardFailure=yes` with the chosen session's 
 instead of hanging. Without a keep-alive in the session, `ServerAliveInterval=30` is added so a dead link
 shows up as failed. Passwords use the same askpass helper as SFTP.
 
-- A local or SOCKS tunnel counts as **up** once its port is listening. gcm checks whether the port is
+- A local or SOCKS tunnel counts as **up** once its port is listening. the app checks whether the port is
   free before starting, so a clash fails straight away. A remote tunnel counts as up once ssh has stayed
   connected for three seconds.
-- Tunnels stop when gcm exits. That also holds if gcm is killed or crashes: on Linux the kernel signals
-  them (`PR_SET_PDEATHSIG`), and on Windows they run in a job object that closes with gcm.
+- Tunnels stop when the app exits. That also holds if it is killed or crashes: on Linux the kernel signals
+  them (`PR_SET_PDEATHSIG`), and on Windows they run in a job object that closes with the app.
 - The *Tunnels* field on an SSH session still works too. Those forwards live and die with that terminal tab.
 
 ## Logs
 
 Each session start writes `<session>_<YYYYmmdd_HHMMSS>.log` to the log folder
-(`~/.config/gcm-rs/logs`, `%APPDATA%\gcm-rs\logs`, or *Log folder* in Settings). *Session → Open log
+(`~/.config/connection-manager/logs`, `%APPDATA%\connection-manager\logs`, or *Log folder* in Settings). *Session → Open log
 folder* opens it.
 
 - The file is plain text with colours and cursor movement removed. A progress counter that redraws a
@@ -168,41 +172,40 @@ folder* opens it.
 ## Command line
 
 ```
-gcm-rs [SESSION | [proto://][user@]host[:port]]...
+connection-manager [SESSION | [proto://][user@]host[:port]]...
 ```
 
 Each argument opens a tab: either the name of a saved session or a quick-connect address.
-`man gcm-rs` has the details once the package is installed.
+`man connection-manager` has the details once the package is installed.
 
 ## Packages
 
-Debian/Ubuntu and Fedora/RHEL/openSUSE packages install the `gcm-rs` command, a menu entry, an icon and a
-man page. They can be installed next to the original Python GCM.
+Debian/Ubuntu and Fedora/RHEL/openSUSE packages install the `connection-manager` command, a menu entry, an icon and a
+man page. They can be installed next to the original Python GNOME Connection Manager.
 
 The packages are built against glibc 2.28, so they install on Debian 10+, Ubuntu 20.04+,
 RHEL/Rocky/Alma 8+, Fedora and openSUSE Leap 15+ (x86_64).
 
 ```sh
-sudo apt install ./gcm-rs_0.1.0-1_amd64.deb     # Debian, Ubuntu
-sudo dnf install ./gcm-rs-0.1.0-1.x86_64.rpm    # Fedora, RHEL
-sudo zypper install ./gcm-rs-0.1.0-1.x86_64.rpm # openSUSE
+sudo apt install ./connection-manager_0.2.0-1_amd64.deb     # Debian, Ubuntu
+sudo dnf install ./connection-manager-0.2.0-1.x86_64.rpm    # Fedora, RHEL
+sudo zypper install ./connection-manager-0.2.0-1.x86_64.rpm # openSUSE
 ```
 
-`apt`/`dnf` also pull in what gcm-rs loads at run time (xkbcommon, OpenGL/EGL) and the recommended
+`apt`/`dnf` also pull in what Connection Manager loads at run time (xkbcommon, OpenGL/EGL) and the recommended
 OpenSSH client. Telnet, FreeRDP, a VNC viewer and CJK fonts are optional extras (*Suggests*).
 
 Where to get them:
 
-- **From CI**: every push builds both packages. They're in the *gcm-rs-packages* artifact of the workflow
+- **From CI**: every push builds both packages. They're in the *connection-manager-packages* artifact of the workflow
   run.
-- **Releases**: pushing a tag `gcm-rs-v<version>` that matches `Cargo.toml` publishes a GitHub release
+- **Releases**: pushing a tag `v<version>` that matches `Cargo.toml` publishes a GitHub release
   with the `.deb`, the `.rpm` and a Windows `.zip`.
 - **Build them yourself**:
 
   ```sh
   cargo install --locked cargo-deb cargo-generate-rpm cargo-zigbuild
   pip install ziglang         # or install zig from your distribution
-  cd gcm-rs
   # Link against glibc 2.28 so the package runs on older distributions too.
   cargo zigbuild --release --target x86_64-unknown-linux-gnu.2.28
   cargo deb --no-build --target x86_64-unknown-linux-gnu
@@ -221,9 +224,8 @@ Package metadata (dependencies, files) lives in `Cargo.toml` under `[package.met
 You need Rust 1.95 or newer ([rustup.rs](https://rustup.rs)).
 
 ```sh
-cd gcm-rs
 cargo build --release
-./target/release/gcm-rs       # Windows: target\release\gcm-rs.exe
+./target/release/connection-manager    # Windows: target\release\connection-manager.exe
 ```
 
 ### Linux
@@ -239,7 +241,7 @@ Fallback fonts are picked up from DejaVu and Noto CJK if installed.
 - **Telnet**: built in; nothing to install.
 - **Mosh**: Windows has no native mosh client. Install it in WSL or Cygwin and set *Settings → Mosh
   command* accordingly (e.g. `wsl mosh`).
-- **X11 forwarding**: Windows has no X server. When an SSH session with *X11 forwarding* opens, gcm-rs
+- **X11 forwarding**: Windows has no X server. When an SSH session with *X11 forwarding* opens, Connection Manager
   checks for one on `localhost:0.0` and, if none answers, starts VcXsrv or Xming if installed (or your
   own *Settings → X server command*), then gives ssh `DISPLAY` so graphical programs open on your
   desktop. X410 works too if it is already running.
@@ -250,16 +252,16 @@ Fallback fonts are picked up from DejaVu and Noto CJK if installed.
 
 | | Linux | Windows |
 |---|---|---|
-| Config | `~/.config/gcm-rs/gcm.toml` | `%APPDATA%\gcm-rs\gcm.toml` |
-| Password key | `~/.config/gcm-rs/key` (mode 0600) | `%APPDATA%\gcm-rs\key` |
-| Tab layout | `~/.config/gcm-rs/layout.json` | `%APPDATA%\gcm-rs\layout.json` |
+| Config | `~/.config/connection-manager/config.toml` | `%APPDATA%\connection-manager\config.toml` |
+| Password key | `~/.config/connection-manager/key` (mode 0600) | `%APPDATA%\connection-manager\key` |
+| Tab layout | `~/.config/connection-manager/layout.json` | `%APPDATA%\connection-manager\layout.json` |
 
-`gcm.toml` is plain TOML and can be edited by hand. Passwords are stored AES-256-GCM encrypted. By default
+`config.toml` is plain TOML and can be edited by hand. Passwords are stored AES-256-GCM encrypted. By default
 the key is random and sits in `key`: as with the original GCM, this only keeps them out of plain sight,
 and anyone who can read both files can recover them.
 
 With a **master password** (*Session → Set master password…*), `key` holds only a salt and a check value,
-and the encryption key is derived from your master password with Argon2id. gcm-rs then starts with
+and the encryption key is derived from your master password with Argon2id. Connection Manager then starts with
 saved passwords locked. Click the field in the *Unlock* dialog, type the password and press Enter, or
 choose *Continue without*. Sessions still connect while locked, but saved passwords aren't typed in, and
 nothing already stored is lost. If you forget the master password, the saved passwords can't be

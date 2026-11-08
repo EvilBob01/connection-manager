@@ -121,7 +121,7 @@ fn color(values: &Values, key: &str, default: &str) -> String {
 }
 
 /// `L8080=localhost:80,R9000=localhost:9000,D1080`, optionally with a 4/6
-/// address-family prefix, to gcm-rs tunnels (`L 8080:localhost:80`).
+/// address-family prefix, to Connection Manager tunnels (`L 8080:localhost:80`).
 fn forwards(spec: &str) -> Vec<String> {
     spec.split(',')
         .filter_map(|f| {
@@ -260,8 +260,10 @@ fn sessions_dir() -> PathBuf {
 pub fn import_local() -> Result<Imported> {
     if cfg!(windows) {
         // Let reg.exe read the registry; its export is what import_reg parses.
-        let tmp =
-            std::env::temp_dir().join(format!("gcm-rs-putty-{}.reg", crate::config::new_id()));
+        let tmp = std::env::temp_dir().join(format!(
+            "connection-manager-putty-{}.reg",
+            crate::config::new_id()
+        ));
         let mut cmd = std::process::Command::new("reg");
         cmd.args(["export", r"HKCU\Software\SimonTatham\PuTTY\Sessions"])
             .arg(&tmp)

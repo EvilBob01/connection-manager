@@ -237,9 +237,9 @@ pub fn ssh_common_args(s: &Session) -> Result<Vec<String>> {
     Ok(args)
 }
 
-const ASKPASS_FLAG: &str = "GCM_ASKPASS";
-const ASKPASS_SECRET: &str = "GCM_ASKPASS_SECRET";
-const ASKPASS_HOST: &str = "GCM_ASKPASS_HOST";
+const ASKPASS_FLAG: &str = "CONNECTION_MANAGER_ASKPASS";
+const ASKPASS_SECRET: &str = "CONNECTION_MANAGER_ASKPASS_SECRET";
+const ASKPASS_HOST: &str = "CONNECTION_MANAGER_ASKPASS_HOST";
 
 /// Whether an ssh prompt may be answered with the saved password of a
 /// session for `host`. Key passphrases are local and always answered.

@@ -58,7 +58,7 @@ pub struct Tunnel {
     pub listen_port: u16,
     pub dest_host: String,
     pub dest_port: u16,
-    /// Start when gcm starts.
+    /// Start when Connection Manager starts.
     pub autostart: bool,
 }
 
@@ -176,7 +176,7 @@ pub fn tunnel_args(t: &Tunnel, s: &Session) -> Result<Vec<String>> {
     Ok(args)
 }
 
-/// A tunnel nobody can see must not outlive gcm, even when gcm is killed
+/// A tunnel nobody can see must not outlive the app, even when it is killed
 /// rather than closed. On Linux the kernel signals the child when its parent
 /// dies (`PR_SET_PDEATHSIG`).
 #[cfg(target_os = "linux")]
@@ -195,8 +195,8 @@ fn die_with_parent(cmd: &mut Command) {
 fn die_with_parent(_cmd: &mut Command) {}
 
 /// Windows counterpart of [`die_with_parent`]: put the child in a job object
-/// that kills its processes when gcm's last handle to it closes, which
-/// happens however gcm exits.
+/// that kills its processes when the app's last handle to it closes, which
+/// happens however the app exits.
 #[cfg(windows)]
 fn kill_on_exit_job(child: &Child) {
     use std::os::windows::io::AsRawHandle;

@@ -367,7 +367,7 @@ pub struct Settings {
     pub log_dir: String,
     /// Input method (IME) for typing e.g. Chinese or Japanese into terminals.
     pub ime: ImeMode,
-    /// Reopen the tabs (and split layout) that were open when gcm-rs closed.
+    /// Reopen the tabs (and split layout) that were open when Connection Manager closed.
     pub restore_tabs: bool,
     /// Windows: the X display ssh forwards X11 to, and the X server to start
     /// when none is running (empty: look for VcXsrv or Xming).
@@ -517,6 +517,8 @@ struct Master {
 
 /// First line of a key file protected by a master password; an unprotected
 /// key file is just 32 random bytes.
+// Both strings are part of the stored format (from the gcm-rs days): changing
+// them would lock out existing master passwords.
 const MASTER_MAGIC: &[u8] = b"gcm-rs master v1\n";
 const MASTER_CHECK: &str = "gcm-rs master password check";
 
@@ -605,18 +607,44 @@ fn derive_key(password: &str, salt: &[u8; 16]) -> Result<[u8; 32]> {
 pub fn config_dir() -> PathBuf {
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("gcm-rs")
+        .join("connection-manager")
+}
+
+/// The settings file inside the config folder.
+const CONFIG_FILE: &str = "config.toml";
+
+/// Carry over the configuration of gcm-rs, as this app was called up to
+/// 0.1.0: its folder becomes ours, and its `gcm.toml` our `config.toml`.
+fn migrate_from_gcm_rs(dir: &Path) {
+    if let Some(old) = dir.parent().map(|p| p.join("gcm-rs"))
+        && !dir.exists()
+        && old.is_dir()
+    {
+        match fs::rename(&old, dir) {
+            Ok(()) => log::info!("moved {} to {}", old.display(), dir.display()),
+            Err(e) => log::warn!("cannot move {}: {e}", old.display()),
+        }
+    }
+    let (old, new) = (dir.join("gcm.toml"), dir.join(CONFIG_FILE));
+    if old.exists()
+        && !new.exists()
+        && let Err(e) = fs::rename(&old, &new)
+    {
+        log::warn!("cannot rename {}: {e}", old.display());
+    }
 }
 
 impl Store {
     pub fn load_default() -> Result<Self> {
-        Self::load(&config_dir())
+        let dir = config_dir();
+        migrate_from_gcm_rs(&dir);
+        Self::load(&dir)
     }
 
     pub fn load(dir: &Path) -> Result<Self> {
         create_private_dir(dir)?;
         let key_path = dir.join("key");
-        recover_staged_key(&key_path, &dir.join("gcm.toml"));
+        recover_staged_key(&key_path, &dir.join(CONFIG_FILE));
         let (key, master) = match read_key_file(&key_path)? {
             Some(KeyFile::Plain(key)) => (Some(key), None),
             Some(KeyFile::Master(m)) => (None, Some(m)),
@@ -627,7 +655,7 @@ impl Store {
                 (Some(key), None)
             }
         };
-        let path = dir.join("gcm.toml");
+        let path = dir.join(CONFIG_FILE);
         let file: FileFormat = if path.exists() {
             let text =
                 fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
@@ -888,8 +916,29 @@ mod tests {
     use super::*;
 
     #[test]
+    fn takes_over_a_gcm_rs_config() {
+        let base = std::env::temp_dir().join(format!("connection-manager-migrate-{}", new_id()));
+        let old = base.join("gcm-rs");
+        let mut store = Store::load(&old).unwrap();
+        let mut s = Session::new(Protocol::Ssh);
+        s.host = "example.org".into();
+        s.password = "pw".into();
+        store.upsert(s);
+        store.save().unwrap();
+        fs::rename(old.join(CONFIG_FILE), old.join("gcm.toml")).unwrap();
+
+        let new = base.join("connection-manager");
+        migrate_from_gcm_rs(&new);
+        assert!(!old.exists());
+        let store = Store::load(&new).unwrap();
+        assert_eq!(store.sessions[0].password, "pw");
+        assert!(new.join(CONFIG_FILE).exists());
+        fs::remove_dir_all(base).unwrap();
+    }
+
+    #[test]
     fn password_roundtrip() {
-        let dir = std::env::temp_dir().join(format!("gcm-rs-test-{}", new_id()));
+        let dir = std::env::temp_dir().join(format!("connection-manager-test-{}", new_id()));
         let mut store = Store::load(&dir).unwrap();
         let mut s = Session::new(Protocol::Ssh);
         s.name = "box".into();
@@ -897,7 +946,7 @@ mod tests {
         s.password = "s3cret ü".into();
         store.upsert(s);
         store.save().unwrap();
-        let text = fs::read_to_string(dir.join("gcm.toml")).unwrap();
+        let text = fs::read_to_string(dir.join(CONFIG_FILE)).unwrap();
         assert!(!text.contains("s3cret"));
         let again = Store::load(&dir).unwrap();
         assert_eq!(again.sessions[0].password, "s3cret ü");
@@ -981,7 +1030,7 @@ mod tests {
 
     #[test]
     fn master_password() {
-        let dir = std::env::temp_dir().join(format!("gcm-rs-test-{}", new_id()));
+        let dir = std::env::temp_dir().join(format!("connection-manager-test-{}", new_id()));
         let mut store = Store::load(&dir).unwrap();
         assert!(!store.has_master_password() && !store.is_locked());
         let mut s = Session::new(Protocol::Ssh);
@@ -1029,7 +1078,7 @@ mod tests {
 
     #[test]
     fn import_skips_duplicates() {
-        let dir = std::env::temp_dir().join(format!("gcm-rs-test-{}", new_id()));
+        let dir = std::env::temp_dir().join(format!("connection-manager-test-{}", new_id()));
         let mut store = Store::load(&dir).unwrap();
         let mut s = Session::new(Protocol::Ssh);
         s.name = "web".into();
@@ -1049,7 +1098,7 @@ mod tests {
 
     #[test]
     fn folders_include_parents() {
-        let dir = std::env::temp_dir().join(format!("gcm-rs-test-{}", new_id()));
+        let dir = std::env::temp_dir().join(format!("connection-manager-test-{}", new_id()));
         let mut store = Store::load(&dir).unwrap();
         let mut s = Session::new(Protocol::Ssh);
         s.folder = "prod/db".into();

@@ -1,16 +1,16 @@
-.TH GCM-RS 1 "November 2026" "gcm-rs 0.1.0" "User Commands"
+.TH CONNECTION-MANAGER 1 "November 2026" "connection-manager 0.2.0" "User Commands"
 .SH NAME
-gcm-rs \- tabbed SSH, SFTP, Telnet, serial, RDP and VNC connection manager
+connection-manager \- tabbed SSH, SFTP, Telnet, serial, RDP and VNC connection manager
 .SH SYNOPSIS
-.B gcm-rs
+.B connection-manager
 [\fISESSION\fR | [\fIproto\fB://\fR][\fIuser\fB@\fR]\fIhost\fR[\fB:\fIport\fR]]...
 .br
-.B gcm-rs
+.B connection-manager
 .BR \-\-help " | " \-\-version
 .SH DESCRIPTION
-.B gcm-rs
-is a graphical connection manager in the style of MobaXterm, and a rewrite of
-GNOME Connection Manager. It keeps saved sessions in a folder tree and opens
+.B connection-manager
+is a graphical connection manager in the style of MobaXterm, based on
+GNOME Connection Manager (it was called gcm-rs up to version 0.1.0). It keeps saved sessions in a folder tree and opens
 them in tabs that can be split.
 .PP
 Terminal sessions run the system's own clients
@@ -54,21 +54,26 @@ Show a short usage summary.
 Show the version.
 .SH FILES
 .TP
-.I ~/.config/gcm-rs/gcm.toml
+.I ~/.config/connection-manager/config.toml
 Sessions, tunnels and settings (plain TOML).
 .TP
-.I ~/.config/gcm-rs/key
+.I ~/.config/connection-manager/key
 Random key used to encrypt saved passwords in
-.IR gcm.toml ,
+.IR config.toml ,
 or, with a master password, the salt from which the key is derived (Argon2id).
 Without a master password anyone who can read both files can recover the
 passwords; prefer SSH keys.
 .TP
-.I ~/.config/gcm-rs/layout.json
+.I ~/.config/connection-manager/layout.json
 Open tabs and split layout, when Settings asks for them to be reopened.
 .TP
-.I ~/.config/gcm-rs/logs/
+.I ~/.config/connection-manager/logs/
 Default folder for session logs.
+.TP
+.I ~/.config/gcm-rs/
+Configuration of gcm-rs 0.1.0, moved to
+.I ~/.config/connection-manager/
+on first start.
 .TP
 .I ~/.gcm/gcm.conf
 Configuration of the original GNOME Connection Manager, which can be imported

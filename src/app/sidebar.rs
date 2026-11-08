@@ -380,7 +380,7 @@ impl App {
     pub(super) fn welcome(&mut self, ui: &mut Ui) {
         ui.vertical_centered(|ui| {
             ui.add_space(ui.available_height() * 0.2);
-            ui.heading(RichText::new("GNOME Connection Manager").size(28.0));
+            ui.heading(RichText::new("Connection Manager").size(28.0));
             ui.label(
                 RichText::new("SSH · Mosh · Telnet · Serial · RDP · VNC · Local shell").weak(),
             );

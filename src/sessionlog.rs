@@ -183,7 +183,7 @@ impl Logger {
         let mut file = BufWriter::new(file);
         writeln!(
             file,
-            "# gcm session log: {name}, started {}",
+            "# Connection Manager session log: {name}, started {}",
             now.format("%Y-%m-%d %H:%M:%S %z")
         )?;
         Ok(Logger {

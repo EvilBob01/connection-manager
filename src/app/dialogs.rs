@@ -417,7 +417,7 @@ impl App {
                         ui.label(if has {
                             "Saved passwords are protected by a master password. Set a new one, or remove it."
                         } else {
-                            "Protect saved passwords with a master password, asked for when gcm-rs starts. \
+                            "Protect saved passwords with a master password, asked for when Connection Manager starts. \
                              Without it, anyone who can read your config folder can recover them."
                         });
                         egui::Grid::new("master_form").num_columns(2).show(ui, |ui| {
@@ -466,10 +466,7 @@ impl App {
                     .resizable(false)
                     .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
                     .show(ctx, |ui| {
-                        ui.heading(format!(
-                            "GNOME Connection Manager {}",
-                            env!("CARGO_PKG_VERSION")
-                        ));
+                        ui.heading(format!("Connection Manager {}", env!("CARGO_PKG_VERSION")));
                         ui.label("Rust/egui rewrite of the tabbed connection manager.");
                         ui.label("Terminal emulation by alacritty_terminal.");
                         if ui.button("Close").clicked() {
@@ -840,7 +837,7 @@ fn tunnel_form(ui: &mut Ui, t: &mut Tunnel, ssh_sessions: &[(u64, String)]) {
             }
 
             ui.label("");
-            ui.checkbox(&mut t.autostart, "Start when gcm starts");
+            ui.checkbox(&mut t.autostart, "Start when Connection Manager starts");
             ui.end_row();
         });
     let help = match t.kind {
