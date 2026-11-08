@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Connection Manager icon: a terminal window with a prompt, linked to two
+     remote hosts. Released under the MIT licence with the rest of the app. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b6cb0"/>
+      <stop offset="1" stop-color="#1a365d"/>
+    </linearGradient>
+  </defs>
+  <!-- tile -->
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#bg)"/>
+  <!-- links to the hosts -->
+  <path d="M150 104 L196 64 M150 152 L196 192" stroke="#90cdf4" stroke-width="10"
+        stroke-linecap="round" fill="none"/>
+  <!-- remote hosts -->
+  <circle cx="200" cy="60" r="22" fill="#90cdf4"/>
+  <circle cx="200" cy="60" r="10" fill="#1a365d"/>
+  <circle cx="200" cy="196" r="22" fill="#90cdf4"/>
+  <circle cx="200" cy="196" r="10" fill="#1a365d"/>
+  <!-- terminal window -->
+  <rect x="36" y="72" width="128" height="112" rx="14" fill="#0d1117"
+        stroke="#e2e8f0" stroke-width="6"/>
+  <rect x="39" y="75" width="122" height="20" rx="10" fill="#e2e8f0"/>
+  <rect x="39" y="85" width="122" height="10" fill="#e2e8f0"/>
+  <!-- prompt: > _ -->
+  <path d="M58 116 L80 133 L58 150" stroke="#68d391" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="90" y="148" width="40" height="10" rx="3" fill="#68d391"/>
+</svg>

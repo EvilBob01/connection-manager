@@ -187,9 +187,9 @@ The packages are built against glibc 2.28, so they install on Debian 10+, Ubuntu
 RHEL/Rocky/Alma 8+, Fedora and openSUSE Leap 15+ (x86_64).
 
 ```sh
-sudo apt install ./connection-manager_0.2.0-1_amd64.deb     # Debian, Ubuntu
-sudo dnf install ./connection-manager-0.2.0-1.x86_64.rpm    # Fedora, RHEL
-sudo zypper install ./connection-manager-0.2.0-1.x86_64.rpm # openSUSE
+sudo apt install ./connection-manager_0.2.1-1_amd64.deb     # Debian, Ubuntu
+sudo dnf install ./connection-manager-0.2.1-1.x86_64.rpm    # Fedora, RHEL
+sudo zypper install ./connection-manager-0.2.1-1.x86_64.rpm # openSUSE
 ```
 
 `apt`/`dnf` also pull in what Connection Manager loads at run time (xkbcommon, OpenGL/EGL) and the recommended
@@ -308,3 +308,10 @@ same machine (`ps`), so on shared machines leave `/p:{password}` out and type it
 and GCM import (checked against output from the original `pyAES.py`). Where OpenSSH's `sftp-server` is
 installed it also runs a full SFTP session (list, cd, upload, download, mkdir, rename, delete, errors)
 against a local server, with no network involved.
+
+## Licence
+
+MIT; see [LICENSE](LICENSE). Versions up to 0.2.0 (including gcm-rs 0.1.0) were released under the
+GPL-3.0. The GCM password import includes a port of pyAES by Brandon Sterne (MIT), whose notice is in
+`LICENSE`. Thanks to Renzo Bertuzzi's [GNOME Connection Manager](https://github.com/kuthulux/gnome-connection-manager),
+which this app started from.

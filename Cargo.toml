@@ -1,10 +1,10 @@
 [package]
 name = "connection-manager"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 rust-version = "1.95"
 description = "Tabbed connection manager (SSH, SFTP, Telnet, serial, RDP, VNC) for Linux and Windows"
-license = "GPL-3.0-only"
+license = "MIT"
 repository = "https://github.com/EvilBob01/connection-manager"
 readme = "README.md"
 
@@ -50,8 +50,8 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Securit
 # the Linux packages from a release build; see README "Packages".
 [package.metadata.deb]
 maintainer = "EvilBob01 <EvilBob01@users.noreply.github.com>"
-copyright = "2020 Renzo Bertuzzi L., 2026 Connection Manager contributors"
-license-file = ["LICENSE", "0"]
+copyright = "2026 EvilBob01 and the Connection Manager contributors"
+license-file = ["LICENSE", "2"]
 section = "net"
 priority = "optional"
 extended-description = """\
@@ -71,17 +71,19 @@ assets = [
     ["target/release/connection-manager", "usr/bin/", "755"],
     ["packaging/connection-manager.desktop", "usr/share/applications/", "644"],
     ["packaging/connection-manager.png", "usr/share/icons/hicolor/128x128/apps/", "644"],
+    ["packaging/connection-manager.svg", "usr/share/icons/hicolor/scalable/apps/", "644"],
     ["packaging/connection-manager.1", "usr/share/man/man1/", "644"],
     ["README.md", "usr/share/doc/connection-manager/", "644"],
 ]
 
 [package.metadata.generate-rpm]
-license = "GPL-3.0-only"
+license = "MIT"
 summary = "Tabbed SSH, SFTP, Telnet, serial, RDP and VNC connection manager"
 assets = [
     { source = "target/release/connection-manager", dest = "/usr/bin/connection-manager", mode = "755" },
     { source = "packaging/connection-manager.desktop", dest = "/usr/share/applications/connection-manager.desktop", mode = "644" },
     { source = "packaging/connection-manager.png", dest = "/usr/share/icons/hicolor/128x128/apps/connection-manager.png", mode = "644" },
+    { source = "packaging/connection-manager.svg", dest = "/usr/share/icons/hicolor/scalable/apps/connection-manager.svg", mode = "644" },
     { source = "packaging/connection-manager.1", dest = "/usr/share/man/man1/connection-manager.1", mode = "644", doc = true },
     { source = "README.md", dest = "/usr/share/doc/connection-manager/README.md", mode = "644", doc = true },
     { source = "LICENSE", dest = "/usr/share/licenses/connection-manager/LICENSE", mode = "644", doc = true },

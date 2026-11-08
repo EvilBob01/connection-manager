@@ -153,6 +153,9 @@ fn decrypt_aes(password: &str, enc: &str) -> Result<String> {
 /// The block cipher in GCM's pyAES.py. It keeps the state row-major but adds
 /// round keys column-major, so it is not interoperable with standard AES and
 /// has to be reproduced exactly.
+///
+/// Ported from pyAES.py, Copyright (c) 2007 Brandon Sterne, MIT licence
+/// (see LICENSE).
 struct PyAes {
     sbox: [u8; 256],
     round_keys: [u8; 240],
